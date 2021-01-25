@@ -7,9 +7,11 @@
 
 - Ce projet représent un dictionnaire de mots en anglais, programmé en C.
 
-> Description
+Description
 
-    Le dictionnaire se base sur deux fonctions de hachages qui permettent d'obtenir une recherche et un ajout en o(1), il y a une pré-selection sur la premiere lettre du mot ensuite la premiere fonction de hachage permet de séparrer les mots (jusqu'à deux collisions - soit 3 mots qui ont la même valeur - ) en résumé la fonction concatene les codes de chaque lettre (et garde le module à chaque iteration) et la deuxieme fonction est une simple fonction qui permet de séparer les 3 mots restants
+```
+Le dictionnaire se base sur deux fonctions de hachages qui permettent d'obtenir une recherche et un ajout en o(1), il y a une pré-selection sur la premiere lettre du mot ensuite la premiere fonction de hachage permet de séparrer les mots (jusqu'à deux collisions - soit 3 mots qui ont la même valeur - ) en résumé la fonction concatene les codes de chaque lettre (et garde le module à chaque iteration) et la deuxieme fonction est une simple fonction qui permet de séparer les 3 mots restants
+```
 
 ## Fonctionnalités :
 - Generer un E-dictionnaire depuis un fichier de mots (le fichier fourni contient 86037 mots)
