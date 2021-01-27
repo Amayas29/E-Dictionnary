@@ -1,8 +1,8 @@
-#include "Dictionary.h"
-#include "hashfunctions.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Dictionary.h"
+#include "hashfunctions.h"
 
 void initDict(dictionary dict) {
 

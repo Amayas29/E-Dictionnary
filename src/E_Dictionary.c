@@ -8,7 +8,7 @@ int main(void) {
 
 	dictionary dict;
 
-	if( start(dict, "Dictionary_ASCII.txt") != 0)
+	if( start(dict, "../Ressources/Dictionary_ASCII.txt") != 0)
 		exit(1);
 
 	printf("\x1b[2J\x1b[1;1H");
