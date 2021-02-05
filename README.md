@@ -18,6 +18,6 @@ Description
 - De supprimer de mots
 
 ## TO-DO : 
-- [ ] Ajout de fonction de suggestion (En-cours)
+- [-] Ajout de fonction de suggestion (En-cours)
 - [ ] Améliorer la structure
 - [ ] Passer sur une interface graphique
