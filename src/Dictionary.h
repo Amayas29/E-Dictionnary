@@ -11,9 +11,8 @@
 	ainsi que sa taille
 */
 typedef struct _phash {
-
-	wordStruct **htab2;
-	int lengthtab2;
+    wordStruct **htab2;
+    int lengthtab2;
 
 } phash;
 
@@ -23,9 +22,8 @@ typedef struct _phash {
 	et sa taille
 */
 typedef struct _tabletter {
-	
-	phash *tabletter;
-	int lengthTabLetter;
+    phash *tabletter;
+    int lengthTabLetter;
 
 } tabletter;
 
@@ -33,12 +31,12 @@ typedef struct _tabletter {
 typedef tabletter dictionary[NUMBER_LETTERS];
 
 // Fonction qui initialise le  dictionnaire
-// Pour chaque case :  
+// Pour chaque case :
 //  lengthTabLetter = 0
 //  tabletter = NULL
 void initDict(dictionary dict);
 
-// Retourne l'adresse du mot donnee en argument 
+// Retourne l'adresse du mot donnee en argument
 // NULL si il n'existe pas
 wordStruct *getWordFromDict(dictionary dict, char *word);
 
@@ -64,6 +62,6 @@ int rebuildStructure(dictionary dict, int firstLetter, int hash1, int hash2);
 // -1 echec
 // 0 succes
 // 1 mot inexistant
-int removeWordFromDictionary(dictionary dict, char* word);
+int removeWordFromDictionary(dictionary dict, char *word);
 
 #endif

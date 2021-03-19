@@ -1,273 +1,255 @@
+#include "Dictionary.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Dictionary.h"
+
 #include "hashfunctions.h"
 
 void initDict(dictionary dict) {
-
-	for(int i = 0; i < NUMBER_LETTERS; i++) {
-
-		dict[ i ].lengthTabLetter = 0;
-		dict[ i ].tabletter = NULL;
-	}
+    for (int i = 0; i < NUMBER_LETTERS; i++) {
+        dict[i].lengthTabLetter = 0;
+        dict[i].tabletter = NULL;
+    }
 }
 
 wordStruct *getWordFromDict(dictionary dict, char *word) {
-	
-	if(word == NULL)
-		return NULL;
+    if (word == NULL)
+        return NULL;
 
-	int hash1 = firstHashage(word);
-	int hash2 = secondHashage(word);
+    int hash1 = firstHashage(word);
+    int hash2 = secondHashage(word);
 
-	int i = 0;
-	while(word[ i ] != '\0' && word[ i ] == '-')
-		 i++;
+    int i = 0;
+    while (word[i] != '\0' && word[i] == '-')
+        i++;
 
-	if(word[ i ] == '\0')
-		return NULL;
+    if (word[i] == '\0')
+        return NULL;
 
-	int firstLetter = word[ i ] - 65;
+    int firstLetter = word[i] - 65;
 
-	int length1 = dict[firstLetter].lengthTabLetter;
-	
-	if(length1 <= hash1 || !dict[firstLetter].tabletter)
-		return NULL;
+    int length1 = dict[firstLetter].lengthTabLetter;
 
-	int length2 = dict[firstLetter].tabletter[hash1].lengthtab2;
-	
-	if(length2 <= hash2 || !dict[firstLetter].tabletter[hash1].htab2 || !dict[firstLetter].tabletter[hash1].htab2[hash2])
-		return NULL;
+    if (length1 <= hash1 || !dict[firstLetter].tabletter)
+        return NULL;
 
-	return getWordFromList(dict[firstLetter].tabletter[hash1].htab2[hash2], word);
+    int length2 = dict[firstLetter].tabletter[hash1].lengthtab2;
+
+    if (length2 <= hash2 || !dict[firstLetter].tabletter[hash1].htab2 || !dict[firstLetter].tabletter[hash1].htab2[hash2])
+        return NULL;
+
+    return getWordFromList(dict[firstLetter].tabletter[hash1].htab2[hash2], word);
 }
 
 int rebuildStructure(dictionary dict, int firstLetter, int hash1, int hash2) {
+    int length1 = dict[firstLetter].lengthTabLetter;
 
-	int length1 = dict[firstLetter].lengthTabLetter;
+    if (length1 == 0) {
+        dict[firstLetter].tabletter = malloc(sizeof(phash));
 
-	if(length1 == 0) {
-		
-		dict[firstLetter].tabletter = malloc(sizeof(phash));
-		
-		if(dict[firstLetter].tabletter == NULL) {
-			fprintf(stderr, "Pointer allocation error\n");
-			return -1;
-		}
-	}
+        if (dict[firstLetter].tabletter == NULL) {
+            fprintf(stderr, "Pointer allocation error\n");
+            return -1;
+        }
+    }
 
-	if(length1 <= hash1) {
+    if (length1 <= hash1) {
+        dict[firstLetter].tabletter = realloc(dict[firstLetter].tabletter,
+                                              (hash1 + 1) * sizeof(phash));
 
-		dict[firstLetter].tabletter = realloc(dict[firstLetter].tabletter,
-		 (hash1+1) * sizeof(phash));
-		
-		if(dict[firstLetter].tabletter == NULL) {
-			fprintf(stderr, "Pointer allocation error\n");
-			return -1;
-		}
+        if (dict[firstLetter].tabletter == NULL) {
+            fprintf(stderr, "Pointer allocation error\n");
+            return -1;
+        }
 
-		dict[firstLetter].lengthTabLetter = hash1 + 1;
-	}
+        dict[firstLetter].lengthTabLetter = hash1 + 1;
+    }
 
-	for(int i = length1; i <=hash1; i++) {
-		dict[firstLetter].tabletter[ i ].htab2 = NULL;
-		dict[firstLetter].tabletter[ i ].lengthtab2 = 0;
-	}
+    for (int i = length1; i <= hash1; i++) {
+        dict[firstLetter].tabletter[i].htab2 = NULL;
+        dict[firstLetter].tabletter[i].lengthtab2 = 0;
+    }
 
-	int length2 = dict[firstLetter].tabletter[hash1].lengthtab2;
+    int length2 = dict[firstLetter].tabletter[hash1].lengthtab2;
 
-	if(length2 == 0) {
+    if (length2 == 0) {
+        dict[firstLetter].tabletter[hash1].lengthtab2 = 0;
+        dict[firstLetter].tabletter[hash1].htab2 = malloc(sizeof(wordStruct *));
 
-		dict[firstLetter].tabletter[hash1].lengthtab2 = 0;
-		dict[firstLetter].tabletter[hash1].htab2 = malloc(sizeof(wordStruct*));
-		
-		if(dict[firstLetter].tabletter[hash1].htab2 == NULL) {
-			fprintf(stderr, "Pointer allocation error\n");
-			return -1;
-		}
-	}
+        if (dict[firstLetter].tabletter[hash1].htab2 == NULL) {
+            fprintf(stderr, "Pointer allocation error\n");
+            return -1;
+        }
+    }
 
-	if(length2 <= hash2) {
+    if (length2 <= hash2) {
+        dict[firstLetter].tabletter[hash1].htab2 = realloc(dict[firstLetter].tabletter[hash1].htab2,
+                                                           (hash2 + 1) * sizeof(wordStruct *));
 
-		dict[firstLetter].tabletter[hash1].htab2 = realloc(dict[firstLetter].tabletter[hash1].htab2,
-		 (hash2+1) * sizeof(wordStruct *));
+        if (dict[firstLetter].tabletter[hash1].htab2 == NULL) {
+            fprintf(stderr, "Pointer allocation error\n");
+            return -1;
+        }
 
-		if(dict[firstLetter].tabletter[hash1].htab2 == NULL) {
-			fprintf(stderr, "Pointer allocation error\n");
-			return -1;
-		}
+        for (int i = length2; i <= hash2; i++)
+            dict[firstLetter].tabletter[hash1].htab2[i] = NULL;
 
-		for(int i = length2; i <=hash2; i++) 
-			dict[firstLetter].tabletter[hash1].htab2[ i ] = NULL;
-		
-		dict[firstLetter].tabletter[hash1].lengthtab2 = hash2 + 1;
-	}
+        dict[firstLetter].tabletter[hash1].lengthtab2 = hash2 + 1;
+    }
 
-	return 0;
-
+    return 0;
 }
 
 int addWordIntoDictionary(dictionary dict, char *word, char *definition) {
+    int hash1 = firstHashage(word);
+    int hash2 = secondHashage(word);
 
-	int hash1 = firstHashage(word);
-	int hash2 = secondHashage(word);
+    int i = 0;
+    while (word[i] != '\0' && word[i] == '-')
+        i++;
 
-	int i = 0;
-	while(word[ i ] != '\0' && word[ i ] == '-')
-		 i++;
+    if (word[i] == '\0')
+        return -1;
 
-	if(word[ i ] == '\0')
-		return -1;
+    int firstLetter = word[i] - 65;
 
-	int firstLetter = word[ i ] - 65;
+    if (rebuildStructure(dict, firstLetter, hash1, hash2) == -1)
+        return -1;
 
-	if(rebuildStructure(dict, firstLetter, hash1, hash2) == -1)
-		return -1;
+    wordStruct **list = &dict[firstLetter].tabletter[hash1].htab2[hash2];
 
-	wordStruct **list = &dict[firstLetter].tabletter[hash1].htab2[hash2];
-	
-	wordStruct *sWord = createWord(word, definition);
-	int res = addWordToList(list, sWord);
+    wordStruct *sWord = createWord(word, definition);
+    int res = addWordToList(list, sWord);
 
-	if(res != 0) 
-		free(sWord);
+    if (res != 0)
+        free(sWord);
 
-	return res;
-
+    return res;
 }
 
 int fillDictionary(dictionary dict, char const *fileName) {
+    FILE *file = fopen(fileName, "r");
 
-	FILE *file = fopen(fileName, "r");
- 
-	if(file == NULL) {
-		fprintf(stderr, "Error opening file\n");
-		return -1;
-	}
-	
-	char c, *word, *definition;
-	char buff[MAX_LENGTH];
-	int i;
+    if (file == NULL) {
+        fprintf(stderr, "Error opening file\n");
+        return -1;
+    }
 
-	printf("Please wait a few moments. (loading words ...)\n");
-	
-	c = fgetc(file);
-	while(!feof(file) && c != '\n')
-		c = fgetc(file);
+    char c, *word, *definition;
+    char buff[MAX_LENGTH];
+    int i;
 
-	while(!feof(file)) {
-		
-		c = fgetc(file);
-		i = 0;
+    printf("Please wait a few moments. (loading words ...)\n");
 
-		while(!feof(file) && c != ':' && i < MAX_LENGTH) {
-			buff[ i++ ] = c;
-			c = fgetc(file);
-		}
+    c = fgetc(file);
+    while (!feof(file) && c != '\n')
+        c = fgetc(file);
 
-		buff[ i ] = '\0';
-		
-		word = malloc(sizeof(char) * i+1);
+    while (!feof(file)) {
+        c = fgetc(file);
+        i = 0;
 
-		if(word == NULL) {
-			fprintf(stderr, "Pointer allocation error\n");
-			fclose(file);
-			return -1;
-		}
-		word = strncpy(word, buff, i);
-		word[ i ] =  '\0';
+        while (!feof(file) && c != ':' && i < MAX_LENGTH) {
+            buff[i++] = c;
+            c = fgetc(file);
+        }
 
-		if(strcmp(word, "") != 0 && strcmp(word, "\n") != 0) {
-			
-			c = fgetc(file);
-			i = 0;
-			
-			while(!feof(file) && c != '\n' && i < MAX_LENGTH) {
-				buff[ i++ ] = c;
-				c = fgetc(file);
-			}
-			buff[ i ] = '\0';
-			
-			definition = malloc(sizeof(char) * i+1);
+        buff[i] = '\0';
 
-			if(definition == NULL) {
-				fprintf(stderr, "Pointer allocation error\n");
-				fclose(file);
-				return -1;
-			}
+        word = malloc(sizeof(char) * i + 1);
 
-			definition = strncpy(definition, buff, i);
-			definition[ i ] =  '\0';
+        if (word == NULL) {
+            fprintf(stderr, "Pointer allocation error\n");
+            fclose(file);
+            return -1;
+        }
+        word = strncpy(word, buff, i);
+        word[i] = '\0';
 
-			if(addWordIntoDictionary(dict, word, definition) != 0) {
-				free(word);
-				free(definition);
-			}
-		}
-		else
-			free(word);
-	}
+        if (strcmp(word, "") != 0 && strcmp(word, "\n") != 0) {
+            c = fgetc(file);
+            i = 0;
 
-	fclose(file);
-	return 0;
+            while (!feof(file) && c != '\n' && i < MAX_LENGTH) {
+                buff[i++] = c;
+                c = fgetc(file);
+            }
+            buff[i] = '\0';
+
+            definition = malloc(sizeof(char) * i + 1);
+
+            if (definition == NULL) {
+                fprintf(stderr, "Pointer allocation error\n");
+                fclose(file);
+                return -1;
+            }
+
+            definition = strncpy(definition, buff, i);
+            definition[i] = '\0';
+
+            if (addWordIntoDictionary(dict, word, definition) != 0) {
+                free(word);
+                free(definition);
+            }
+        } else
+            free(word);
+    }
+
+    fclose(file);
+    return 0;
 }
 
 void freeDictionary(dictionary dict) {
+    for (int i = 0; i < NUMBER_LETTERS; i++) {
+        if (!dict[i].tabletter)
+            continue;
 
-	for(int i = 0; i < NUMBER_LETTERS; i++) {
-		
-		if(!dict[ i ].tabletter)
-			continue;
+        int length1 = dict[i].lengthTabLetter;
 
-		int length1 = dict[ i ].lengthTabLetter;
+        for (int j = 0; j < length1; j++) {
+            if (!dict[i].tabletter[j].htab2)
+                continue;
 
-		for(int j = 0; j < length1; j++) {
-			
-			if(! dict[ i ].tabletter[ j ].htab2)
-				continue;
+            int length2 = dict[i].tabletter[j].lengthtab2;
 
-			int length2 = dict[ i ].tabletter[ j ].lengthtab2;
+            for (int k = 0; k < length2; k++) {
+                if (!dict[i].tabletter[j].htab2[k])
+                    continue;
 
-			for(int k = 0; k < length2; k++) {
+                freeListWords(dict[i].tabletter[j].htab2[k]);
+            }
 
-				if(! dict[ i ].tabletter[ j ].htab2[ k ])
-					continue;
+            free(dict[i].tabletter[j].htab2);
+        }
 
-				freeListWords(dict[ i ].tabletter[ j ].htab2[ k ]);
-			}
-			
-			free(dict[ i ].tabletter[ j ].htab2);
-		}
-
-		free(dict[ i ].tabletter);
-	}
+        free(dict[i].tabletter);
+    }
 }
 
-int removeWordFromDictionary(dictionary dict, char* word) {
+int removeWordFromDictionary(dictionary dict, char *word) {
+    if (word == NULL)
+        return -1;
 
-	if(word == NULL)
-		return -1;
+    int hash1 = firstHashage(word);
+    int hash2 = secondHashage(word);
 
-	int hash1 = firstHashage(word);
-	int hash2 = secondHashage(word);
+    int i = 0;
+    while (word[i] != '\0' && word[i] == '-')
+        i++;
 
-	int i = 0;
-	while(word[ i ] != '\0' && word[ i ] == '-')
-		 i++;
+    if (word[i] == '\0')
+        return -1;
 
-	if(word[ i ] == '\0')
-		return -1;
+    int firstLetter = word[i] - 65;
 
-	int firstLetter = word[ i ] - 65;
+    wordStruct *sWord = getWordFromDict(dict, word);
 
-	wordStruct *sWord = getWordFromDict(dict, word);
-	
-	if(sWord == NULL)
-		return 1;
+    if (sWord == NULL)
+        return 1;
 
-	wordStruct **list = &dict[firstLetter].tabletter[hash1].htab2[hash2];
-	removeWordFromList(list, sWord);
+    wordStruct **list = &dict[firstLetter].tabletter[hash1].htab2[hash2];
+    removeWordFromList(list, sWord);
 
-	return 0;
+    return 0;
 }

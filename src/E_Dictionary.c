@@ -1,82 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "Dictionary.h"
 #include "UIfunctions.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 
 int main(void) {
+    dictionary dict;
 
-	dictionary dict;
+    if (start(dict, "../Ressources/Dictionary_ASCII.txt") != 0)
+        exit(1);
 
-	if( start(dict, "../Ressources/Dictionary_ASCII.txt") != 0)
-		exit(1);
+    printf("\x1b[2J\x1b[1;1H");
 
-	printf("\x1b[2J\x1b[1;1H");
+    char *answer = malloc(sizeof(char) * 3);
 
-	char *answer = malloc(sizeof(char) * 3);
+    printf("\n\n");
 
-	printf("\n\n");
+    while (1) {
+        displayMenuChoices();
 
-	while(1) {
+        answer = fgets(answer, 3, stdin);
 
-		displayMenuChoices();
+        if (answer[1] != '\n' && strlen(answer) >= 2) {
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF)
+                ;
+        }
 
-		answer = fgets(answer, 3, stdin);
+        answer = trim(answer);
 
-		if(answer[1] != '\n' && strlen(answer) >= 2) {
-			int ch;
-			while ((ch = getchar()) != '\n' && ch != EOF);
-		}
+        printf("\n");
 
-		answer = trim(answer);
+        if (strcmp(answer, "1") == 0) {
+            wordStruct *sWord = searchWord(dict);
 
-		printf("\n");
+            if (sWord != NULL)
+                printWord(sWord);
+            else
+                printf("\t Word not found.");
+        } else if (strcmp(answer, "2") == 0) {
+            int res = addWord(dict);
+            if (res == 1)
+                printf("\t Word already exist");
+            else if (res == 0)
+                printf("\t Word insertion done");
+            else
+                printf("\t Error during insertion");
 
-		if(strcmp(answer, "1") == 0) {
-			
-			wordStruct *sWord = searchWord(dict);
-			
-			if(sWord != NULL)
-				printWord(sWord);
-			else
-				printf("\t Word not found.");
-		}
-		else if(strcmp(answer, "2") == 0) {
-			
-			int res = addWord(dict);
-			if(res == 1)
-				printf("\t Word already exist");
-			else if(res == 0)
-				printf("\t Word insertion done");
-			else
-				printf("\t Error during insertion");
+        } else if (strcmp(answer, "3") == 0) {
+            int res = removeWord(dict);
+            if (res == 1)
+                printf("\t Word does not exist");
+            else if (res == 0)
+                printf("\t Word deletion done");
+            else
+                printf("\t Error during deletion");
+        } else if (strcmp(answer, "4") == 0)
+            break;
+        else
+            printf("Invalide Choose ! Retry ");
 
-		}
-		else if(strcmp(answer, "3") == 0) {
+        printf("\n\n  Press enter to continue ... \n");
+        while (fgetc(stdin) != '\n')
+            ;
 
-			int res = removeWord(dict);
-			if(res == 1)
-				printf("\t Word does not exist");
-			else if(res == 0)
-				printf("\t Word deletion done");
-			else
-				printf("\t Error during deletion");
-		}
-		else if(strcmp(answer, "4") == 0)
-			break;
-		else
-			printf("Invalide Choose ! Retry ");
+        printf("\x1b[2J\x1b[1;1H");
+    }
 
-		printf("\n\n  Press enter to continue ... \n");
-		while(fgetc(stdin) != '\n');
+    free(answer);
 
-		printf("\x1b[2J\x1b[1;1H");
-	}
+    quit(dict);
+    printf("\n");
 
-	free(answer);
-
-	quit(dict);
-	printf("\n");
-
-	return 0;
+    return 0;
 }

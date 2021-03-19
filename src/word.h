@@ -10,10 +10,9 @@
 */
 typedef struct _wordStruct wordStruct;
 struct _wordStruct {
-	
-	char *word;
-	char *definition;
-	wordStruct *next;
+    char *word;
+    char *definition;
+    wordStruct *next;
 };
 
 // Creer un mot a partir des infos donnes en argument

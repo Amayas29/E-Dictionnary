@@ -31,7 +31,7 @@ int addWord(dictionary dict);
 
 // Fonction de recherche :
 // Lit un mots
-// Retourne l'adresse du mot 
+// Retourne l'adresse du mot
 // NULL si il n'existe pas
 wordStruct *searchWord(dictionary dict);
 
